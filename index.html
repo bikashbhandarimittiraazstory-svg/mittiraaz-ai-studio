@@ -9,7 +9,7 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;padding:16px;background:#111827;color:white;font-family:Arial,sans-serif}
-.container{max-width:700px;margin:auto}
+.container{max-width:750px;margin:auto}
 h1{color:#fbbf24;text-align:center}
 .card{background:#1f2937;padding:16px;border-radius:14px;margin:15px 0}
 label{display:block;margin:12px 0 6px}
@@ -24,16 +24,16 @@ button:disabled{opacity:.5}
 <body>
 <div class="container">
 <h1>🎬 MittiRaaz AI Studio</h1>
-<p style="text-align:center">आपका अपना AI Video & YouTube SEO Assistant</p>
+<p style="text-align:center">Long Video Script & YouTube SEO Assistant</p>
 
 <div class="card">
-<h2>वीडियो स्क्रिप्ट बनाएं</h2>
+<h2>पूरी वीडियो बनाएं</h2>
 
 <label>चैनल का नाम</label>
 <input id="channel" value="MittiRaaz Story">
 
-<label>वीडियो का विषय / कहानी</label>
-<textarea id="idea" placeholder="अपनी कहानी या वीडियो का विचार लिखें..."></textarea>
+<label>कहानी का विषय</label>
+<textarea id="idea" placeholder="अपनी कहानी का विषय लिखें..."></textarea>
 
 <label>वीडियो की भाषा</label>
 <select id="language">
@@ -42,7 +42,7 @@ button:disabled{opacity:.5}
 <option value="Hinglish">Hinglish</option>
 </select>
 
-<label>वीडियो कितने मिनट का चाहिए?</label>
+<label>वीडियो की कुल लंबाई</label>
 <select id="duration">
 <option value="5">5 मिनट</option>
 <option value="10">10 मिनट</option>
@@ -53,22 +53,23 @@ button:disabled{opacity:.5}
 </select>
 
 <div id="customBox" style="display:none">
-<label>कितने मिनट?</label>
+<label>कितने मिनट? (1 से 120)</label>
 <input id="customDuration" type="number" min="1" max="120" placeholder="जैसे 25">
 </div>
 
-<button id="generate">✨ पूरी वीडियो स्क्रिप्ट बनाएं</button>
+<button id="generate">🎬 पूरी वीडियो स्क्रिप्ट बनाएं</button>
+<button id="continue" style="display:none">▶️ बाकी Scenes जारी रखें</button>
 <button id="save">💾 प्रोजेक्ट सेव करें</button>
-<p id="status" class="status"></p>
+<p id="status" class="status">हर Scene 10 सेकंड का होगा।</p>
 </div>
 
 <div class="card">
-<h2>YouTube SEO बनाएं</h2>
+<h2>YouTube SEO</h2>
 <button id="seo">🚀 SEO तैयार करें</button>
 </div>
 
 <div class="card">
-<h2>AI Result</h2>
+<h2>आपकी पूरी स्क्रिप्ट</h2>
 <div id="result">आपका AI Result यहाँ दिखाई देगा।</div>
 <button id="copy">📋 Copy Result</button>
 </div>
@@ -76,8 +77,10 @@ button:disabled{opacity:.5}
 
 <script>
 const WORKER_URL="https://shiny-silence-623a.bikashbhandarimittiraazstory.workers.dev";
-
 const $=id=>document.getElementById(id);
+const STORAGE="mittiraazLongVideoProjectV2";
+let project=null;
+let busy=false;
 
 $("duration").addEventListener("change",()=>{
   $("customBox").style.display=
@@ -94,6 +97,13 @@ function getDuration(){
   return Number($("duration").value);
 }
 
+function saveProgress(){
+  localStorage.setItem(STORAGE,JSON.stringify(project));
+  $("result").textContent=project.output||"";
+  $("continue").style.display=
+    project && project.nextScene<=project.totalScenes ? "inline-block":"none";
+}
+
 async function askAI(prompt){
   const response=await fetch(WORKER_URL,{
     method:"POST",
@@ -106,60 +116,186 @@ async function askAI(prompt){
   return data.text;
 }
 
-$("generate").addEventListener("click",async()=>{
+function characterPrompt(){
+return `
+आप एक अनुभवी भारतीय कहानी लेखक और AI फिल्म निर्देशक हैं।
+
+चैनल: ${project.channel}
+कहानी: ${project.idea}
+भाषा: ${project.language}
+
+सबसे पहले पूरी कहानी के सभी मुख्य और सहायक पात्रों की Character Bible बनाएं।
+हर पात्र की उम्र, चेहरा, त्वचा का रंग, बाल, शरीर, कपड़े, जूते, गहने, आवाज और बोलने का अंदाज स्पष्ट लिखें।
+हर पात्र का नाम और उसका स्थायी रूप तय करें।
+कहानी की दुनिया, गाँव, घर और अन्य मुख्य जगहों का रूप भी तय करें।
+
+ये सभी विवरण आगे के हर Scene में बिल्कुल समान रहने चाहिए।
+नए Scene में पात्रों का चेहरा, कपड़े, उम्र या आवाज न बदलें।
+कहानी का पूरा अंत पहले से सोचें। कहानी में शुरुआत, संघर्ष, सस्पेंस, क्लाइमैक्स और संतोषजनक अंत होना चाहिए।
+
+केवल Character Bible और कहानी का संक्षिप्त पूरा प्लान दें।
+अभी Scenes न लिखें।
+`;
+}
+
+function scenePrompt(start,end){
+const total=project.totalScenes;
+return `
+आप एक प्रोफेशनल YouTube Long Film Script Writer और Google Flow AI Video Prompt Expert हैं।
+
+चैनल: ${project.channel}
+कहानी: ${project.idea}
+भाषा: ${project.language}
+कुल वीडियो अवधि: ${project.minutes} मिनट
+कुल Scenes: ${total}
+हर Scene की अवधि: बिल्कुल 10 सेकंड।
+
+यह Character Bible और पूरी कहानी का प्लान है:
+${project.bible}
+
+अब केवल Scene ${start} से Scene ${end} तक लिखें।
+कहानी का क्रम न तोड़ें। पिछले Scenes की घटनाओं को आगे बढ़ाएं।
+पूरी कहानी के तय अंत तक पहुंचने की योजना का पालन करें।
+
+बहुत जरूरी नियम:
+1. हर Scene बिल्कुल 10 सेकंड का हो।
+2. हर Scene के लिए अलग Image Prompt लिखें।
+3. हर Scene के लिए अलग Video Prompt लिखें।
+4. हर Video Prompt Google Flow में सीधे इस्तेमाल करने लायक हो।
+5. हर Video Prompt में 10-second duration, camera movement और character action स्पष्ट हों।
+6. हर Scene में आवश्यक Dialogue, Voice-over, Background Music और SFX दें।
+7. Dialogue 10 सेकंड में बोले जा सकने जितना ही रखें।
+8. पात्रों का चेहरा, शरीर, कपड़े, आवाज और रंग Character Bible के अनुसार समान रखें।
+9. एक Scene में जितने पात्र जरूरी हों, केवल उतने ही दिखाएं।
+10. Image Prompt और Video Prompt में वही पात्र और वही स्थान हों।
+11. कहानी को छोटा करके Scenes कम न करें।
+12. कोई Scene छोड़ें नहीं और Scene numbering बिल्कुल सही रखें।
+13. हर Scene में कहानी आगे बढ़नी चाहिए। एक ही दृश्य को बार-बार न दोहराएं।
+14. Image और Video Prompt विस्तृत, स्पष्ट और उपयोगी हों।
+15. Video का aspect ratio 16:9 रखें।
+
+हर Scene का Format:
+
+SCENE NUMBER
+समय: 00:00–00:10
+
+Scene में क्या होगा:
+दृश्य की छोटी जानकारी।
+
+IMAGE PROMPT:
+अंग्रेजी में पूरा visual prompt। Character Bible के अनुसार पात्रों का रूप दोहराएं।
+
+VIDEO PROMPT:
+अंग्रेजी में पूरा Google Flow prompt। Exactly 10 seconds, action, expressions, camera movement और continuity निर्देश शामिल हों।
+
+DIALOGUE / VOICE-OVER:
+पात्र का नाम और उसका संवाद। जरूरत के अनुसार narration भी।
+
+BACKGROUND MUSIC:
+इस Scene के लिए संगीत।
+
+SFX:
+आवश्यक ध्वनि प्रभाव।
+
+अब केवल Scene ${start} से ${end} तक लिखें।
+आउटपुट में इन Scenes के अलावा कुछ न लिखें।
+`;
+}
+
+async function runBatches(){
+if(busy)return;
+busy=true;
+$("generate").disabled=true;
+$("continue").disabled=true;
+
+try{
+  if(!project.bible){
+    $("status").textContent="AI पूरी कहानी और Character Bible तैयार कर रहा है...";
+    project.bible=await askAI(characterPrompt());
+    saveProgress();
+  }
+
+  const batchSize=10;
+
+  while(project.nextScene<=project.totalScenes){
+    const start=project.nextScene;
+    const end=Math.min(start+batchSize-1,project.totalScenes);
+
+    $("status").textContent=
+      "AI Scene "+start+" से "+end+" तैयार कर रहा है। कुल "+project.totalScenes+" Scenes हैं।";
+
+    const answer=await askAI(scenePrompt(start,end));
+
+    project.output +=
+      "\n\n========================================\n"+
+      "SCENES "+start+" TO "+end+
+      "\n========================================\n\n"+
+      answer;
+
+    project.nextScene=end+1;
+    saveProgress();
+
+    $("status").textContent=
+      "Scene "+end+" / "+project.totalScenes+" तैयार हो गए।";
+  }
+
+  project.completed=true;
+  saveProgress();
+  $("status").textContent=
+    "🎉 पूरी "+project.minutes+" मिनट की स्क्रिप्ट तैयार हो गई! कुल "+project.totalScenes+" Scenes।";
+
+}catch(e){
+  $("status").textContent=
+    "रुक गया: "+e.message+" । पहले से तैयार Scenes सेव हैं। बाकी के लिए जारी रखें दबाएं।";
+}finally{
+  busy=false;
+  $("generate").disabled=false;
+  $("continue").disabled=false;
+  $("continue").style.display=
+    project && project.nextScene<=project.totalScenes ? "inline-block":"none";
+}
+}
+
+$("generate").addEventListener("click",()=>{
   const idea=$("idea").value.trim();
   if(!idea){$("status").textContent="पहले कहानी का विषय लिखें।";return;}
+
   let minutes;
   try{minutes=getDuration();}catch(e){$("status").textContent=e.message;return;}
 
-  $("generate").disabled=true;
-  $("status").textContent="AI आपकी पूरी वीडियो स्क्रिप्ट तैयार कर रहा है...";
-  $("result").textContent="कृपया प्रतीक्षा करें...";
+  const totalScenes=minutes*6;
 
-  const prompt=`
-आप एक अनुभवी YouTube Long Video Script Writer और Director हैं।
+  project={
+    channel:$("channel").value.trim()||"MittiRaaz Story",
+    idea,
+    language:$("language").value,
+    minutes,
+    totalScenes,
+    nextScene:1,
+    bible:"",
+    output:"",
+    completed:false
+  };
 
-चैनल: ${$("channel").value}
-विषय: ${idea}
-भाषा: ${$("language").value}
-वीडियो की अवधि: ${minutes} मिनट।
+  saveProgress();
+  runBatches();
+});
 
-बहुत जरूरी निर्देश:
-यह केवल LONG VIDEO है। YouTube Short या 10 सेकंड की वीडियो बिल्कुल नहीं बनानी है।
+$("continue").addEventListener("click",()=>{
+  if(project)runBatches();
+});
 
-पूरी ${minutes} मिनट की वीडियो के लिए विस्तार से स्क्रिप्ट लिखें।
-कहानी की लंबाई और संवाद चुनी गई अवधि के अनुसार रखें।
-जल्दी कहानी समाप्त न करें और केवल सारांश न दें।
-
-आउटपुट इस क्रम में दें:
-
-1. आकर्षक वीडियो का नाम।
-2. पहले 20-30 सेकंड का दमदार Hook।
-3. पूरी कहानी की शुरुआत, बीच और अंत।
-4. कहानी को क्रमवार Scenes में बाँटें।
-5. हर Scene का अनुमानित समय लिखें।
-6. हर Scene के लिए विस्तार से Image Prompt दें।
-7. हर Scene के लिए विस्तार से Video Prompt दें।
-8. हर Scene के सभी पात्रों के संवाद और Voice-over लिखें।
-9. Background Music और Sound Effects बताएं।
-10. हर Scene में पात्रों का चेहरा, उम्र, कपड़े, रंग और रूप एक जैसा रखें।
-11. कहानी में भावनाएं, सस्पेंस और दर्शकों की रुचि बनाए रखें।
-12. अंत में स्वाभाविक Like, Comment और Subscribe CTA दें।
-
-हर Scene में Image Prompt और Video Prompt अलग-अलग स्पष्ट लिखें।
-वीडियो की कुल अवधि लगभग ${minutes} मिनट होनी चाहिए।
-भाषा सरल, रोचक और दर्शकों के लिए आकर्षक रखें।
-`;
-
-  try{
-    const answer=await askAI(prompt);
-    $("result").textContent=answer;
-    $("status").textContent="स्क्रिप्ट तैयार हो गई।";
-  }catch(e){
-    $("status").textContent="Error: "+e.message;
-  }finally{
-    $("generate").disabled=false;
-  }
+$("save").addEventListener("click",()=>{
+  if(project)saveProgress();
+  const extra={
+    channel:$("channel").value,
+    idea:$("idea").value,
+    language:$("language").value,
+    duration:$("duration").value,
+    customDuration:$("customDuration").value
+  };
+  localStorage.setItem("mittiraazForm",JSON.stringify(extra));
+  $("status").textContent="प्रोजेक्ट और उपलब्ध स्क्रिप्ट सेव हो गई।";
 });
 
 $("seo").addEventListener("click",async()=>{
@@ -171,20 +307,15 @@ $("seo").addEventListener("click",async()=>{
     const prompt=`
 YouTube Long Video SEO Expert बनें।
 चैनल: ${$("channel").value}
-वीडियो का विषय: ${idea}
+विषय: ${idea}
 भाषा: ${$("language").value}
 यह Long Video है, Short नहीं।
 
-तैयार करें:
-1. SEO Title
-2. आकर्षक Description
-3. Keywords
-4. YouTube Tags (comma separated)
-5. Hashtags
-6. Thumbnail पर छोटा और आकर्षक Text
-सब कुछ चुनी हुई भाषा में दें।
+SEO Title, Description, Keywords, comma-separated Tags,
+Hashtags और Thumbnail Text तैयार करें।
 `;
-    $("result").textContent=await askAI(prompt);
+    const answer=await askAI(prompt);
+    $("result").textContent=answer;
     $("status").textContent="SEO तैयार हो गया।";
   }catch(e){
     $("status").textContent="Error: "+e.message;
@@ -193,41 +324,34 @@ YouTube Long Video SEO Expert बनें।
   }
 });
 
-$("save").addEventListener("click",()=>{
-  const project={
-    channel:$("channel").value,
-    idea:$("idea").value,
-    language:$("language").value,
-    duration:$("duration").value,
-    customDuration:$("customDuration").value,
-    result:$("result").textContent
-  };
-  localStorage.setItem("mittiraazProject",JSON.stringify(project));
-  $("status").textContent="प्रोजेक्ट इस ब्राउज़र में सेव हो गया।";
-});
-
 $("copy").addEventListener("click",async()=>{
   try{
     await navigator.clipboard.writeText($("result").textContent);
-    $("status").textContent="Result Copy हो गया।";
+    $("status").textContent="Copy हो गया।";
   }catch(e){
-    $("status").textContent="Copy नहीं हुआ। Result को दबाकर Copy करें।";
+    $("status").textContent="Result को दबाकर Select All और Copy करें।";
   }
 });
 
-const saved=localStorage.getItem("mittiraazProject");
-if(saved){
-  try{
-    const p=JSON.parse(saved);
+try{
+  const old=localStorage.getItem(STORAGE);
+  if(old){
+    project=JSON.parse(old);
+    $("result").textContent=project.output||"";
+    $("continue").style.display=
+      project.nextScene<=project.totalScenes?"inline-block":"none";
+  }
+  const form=localStorage.getItem("mittiraazForm");
+  if(form){
+    const p=JSON.parse(form);
     $("channel").value=p.channel||"MittiRaaz Story";
     $("idea").value=p.idea||"";
     $("language").value=p.language||"Hindi";
     $("duration").value=p.duration||"15";
     $("customDuration").value=p.customDuration||"";
     $("customBox").style.display=p.duration==="custom"?"block":"none";
-    $("result").textContent=p.result||"आपका AI Result यहाँ दिखाई देगा।";
-  }catch(e){}
-}
+  }
+}catch(e){}
 </script>
 </body>
 </html>
