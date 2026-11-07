@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101827">
+<link rel="manifest" href="manifest.webmanifest">
+<title>MittiRaaz AI Studio</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0b1220;color:#f8fafc;font:16px system-ui,sans-serif}
+main{max-width:720px;margin:auto;padding:22px}.brand{font-size:27px;font-weight:800;color:#fbbf24}
+p{color:#cbd5e1;line-height:1.5}.card{background:#172338;border:1px solid #334155;border-radius:16px;padding:16px;margin:14px 0}
+h2{font-size:19px;margin:0 0 10px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{width:100%;padding:14px;border:0;border-radius:12px;background:#f59e0b;color:#111827;font-weight:750;font-size:15px}
+input,textarea{width:100%;padding:13px;border-radius:10px;border:1px solid #475569;background:#0f172a;color:white;margin:7px 0 12px}
+.small{font-size:13px;color:#94a3b8}.status{color:#fbbf24;font-weight:700}
+</style>
+</head>
+<body>
+<main>
+  <div class="brand">MittiRaaz AI Studio</div>
+  <p>Your mobile workspace for video ideas, scripts and YouTube publishing.</p>
+  <div class="card">
+    <h2>Create a project</h2>
+    <label for="idea">Video idea</label>
+    <textarea id="idea" rows="3" placeholder="Write your video idea here..."></textarea>
+    <label for="channel">Channel name</label>
+    <input id="channel" placeholder="e.g. MittiRaaz Story">
+    <button id="save">Save project on this phone</button>
+    <p id="message" class="small">Projects are saved only in this browser on this device.</p>
+  </div>
+  <div class="grid">
+    <div class="card"><h2>AI Script</h2><p class="small">Not connected yet</p></div>
+    <div class="card"><h2>Auto SEO</h2><p class="small">Not connected yet</p></div>
+    <div class="card"><h2>Thumbnail</h2><p class="small">Not connected yet</p></div>
+    <div class="card"><h2>YouTube Manager</h2><p class="small">Not connected yet</p></div>
+  </div>
+  <div class="card"><h2>Analytics</h2><p class="small">YouTube connection required — not connected.</p></div>
+  <p class="small">Prototype only. AI generation, video rendering, YouTube upload and analytics are not active. No paid API or billing is enabled.</p>
+</main>
+<script>
+const idea=document.getElementById('idea'), channel=document.getElementById('channel');
+document.getElementById('save').addEventListener('click',()=>{
+  const project={idea:idea.value,channel:channel.value,createdAt:new Date().toISOString()};
+  if(!project.idea.trim()){document.getElementById('message').textContent='Please enter a video idea first.';return;}
+  const items=JSON.parse(localStorage.getItem('mittiraazProjects')||'[]');items.push(project);
+  localStorage.setItem('mittiraazProjects',JSON.stringify(items));
+  document.getElementById('message').textContent='Project saved on this phone.';
+});
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
+</script>
+</body>
+</html>
