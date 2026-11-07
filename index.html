@@ -1,192 +1,232 @@
+
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#101827">
-<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#111827">
 <title>MittiRaaz AI Studio</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#0b1220;color:#f8fafc;font:16px system-ui,sans-serif}
-main{max-width:720px;margin:auto;padding:20px}
-.brand{font-size:27px;font-weight:800;color:#fbbf24}
-p{color:#cbd5e1;line-height:1.5}
-.card{background:#172338;border:1px solid #334155;border-radius:16px;padding:16px;margin:14px 0}
-h2{font-size:19px;margin:0 0 10px}
-button{width:100%;padding:14px;border:0;border-radius:12px;background:#f59e0b;color:#111827;font-weight:750;font-size:15px;margin:7px 0}
-input,textarea,select{width:100%;padding:13px;border-radius:10px;border:1px solid #475569;background:#0f172a;color:white;margin:7px 0 12px}
-.small{font-size:13px;color:#94a3b8}
-#result{white-space:pre-wrap;overflow-wrap:anywhere;color:#fff;line-height:1.6}
-.status{color:#fbbf24}
+body{margin:0;padding:16px;background:#111827;color:white;font-family:Arial,sans-serif}
+.container{max-width:700px;margin:auto}
+h1{color:#fbbf24;text-align:center}
+.card{background:#1f2937;padding:16px;border-radius:14px;margin:15px 0}
+label{display:block;margin:12px 0 6px}
+input,select,textarea{width:100%;padding:12px;border-radius:8px;border:1px solid #4b5563;background:#111827;color:white;font-size:16px}
+textarea{min-height:110px}
+button{padding:13px;border:0;border-radius:9px;background:#f59e0b;color:#111827;font-weight:bold;font-size:16px;margin:8px 4px 0 0}
+button:disabled{opacity:.5}
+#result{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6}
+.status{color:#86efac}
 </style>
 </head>
 <body>
-<main>
-<div class="brand">MittiRaaz AI Studio</div>
-<p> आपका अपना AI Video और YouTube SEO Studio</p>
+<div class="container">
+<h1>🎬 MittiRaaz AI Studio</h1>
+<p style="text-align:center">आपका अपना AI Video & YouTube SEO Assistant</p>
 
 <div class="card">
-<h2>🎬 Create Your Project</h2>
-<label>Video Idea</label>
-<textarea id="idea" rows="3" placeholder="अपनी वीडियो की कहानी या आइडिया लिखें"></textarea>
+<h2>वीडियो स्क्रिप्ट बनाएं</h2>
 
-<label>Channel Name</label>
-<input id="channel" placeholder="MittiRaaz Story">
+<label>चैनल का नाम</label>
+<input id="channel" value="MittiRaaz Story">
 
-<label>Video Language</label>
+<label>वीडियो का विषय / कहानी</label>
+<textarea id="idea" placeholder="अपनी कहानी या वीडियो का विचार लिखें..."></textarea>
+
+<label>वीडियो की भाषा</label>
 <select id="language">
-<option>Hindi</option>
-<option>American English</option>
-<option>English</option>
+<option value="Hindi">हिंदी</option>
+<option value="English">English</option>
+<option value="Hinglish">Hinglish</option>
 </select>
 
-<button id="save">Save Project</button>
-<p id="message" class="small">Project इस फोन में सेव होगा।</p>
+<label>वीडियो कितने मिनट का चाहिए?</label>
+<select id="duration">
+<option value="5">5 मिनट</option>
+<option value="10">10 मिनट</option>
+<option value="15" selected>15 मिनट</option>
+<option value="20">20 मिनट</option>
+<option value="30">30 मिनट</option>
+<option value="custom">अपनी पसंद का समय</option>
+</select>
+
+<div id="customBox" style="display:none">
+<label>कितने मिनट?</label>
+<input id="customDuration" type="number" min="1" max="120" placeholder="जैसे 25">
+</div>
+
+<button id="generate">✨ पूरी वीडियो स्क्रिप्ट बनाएं</button>
+<button id="save">💾 प्रोजेक्ट सेव करें</button>
+<p id="status" class="status"></p>
 </div>
 
 <div class="card">
-<h2>🤖 AI Script Generator</h2>
-<button id="script">Generate AI Script</button>
+<h2>YouTube SEO बनाएं</h2>
+<button id="seo">🚀 SEO तैयार करें</button>
 </div>
 
 <div class="card">
-<h2>🚀 Auto SEO Generator</h2>
-<button id="seo">Generate YouTube SEO</button>
-</div>
-
-<div class="card">
-<h2>📄 AI Result</h2>
-<p id="status" class="status">AI अभी तैयार है।</p>
+<h2>AI Result</h2>
 <div id="result">आपका AI Result यहाँ दिखाई देगा।</div>
-<button id="copy">Copy Result</button>
+<button id="copy">📋 Copy Result</button>
 </div>
-
-<div class="card">
-<h2>🎨 Thumbnail</h2>
-<p class="small">अभी कनेक्ट नहीं है।</p>
-<h2>📺 YouTube Manager</h2>
-<p class="small">अभी कनेक्ट नहीं है।</p>
-<h2>📊 Analytics</h2>
-<p class="small">YouTube कनेक्शन अभी बाकी है।</p>
 </div>
-
-<p class="small">MittiRaaz AI Studio | Free-tier AI connection. No paid billing enabled.</p>
-</main>
 
 <script>
-const WORKER_URL = "https://shiny-silence-623a.bikashbhandarimittiraazstory.workers.dev";
+const WORKER_URL="https://shiny-silence-623a.bikashbhandarimittiraazstory.workers.dev";
 
-const idea = document.getElementById("idea");
-const channel = document.getElementById("channel");
-const language = document.getElementById("language");
-const result = document.getElementById("result");
-const status = document.getElementById("status");
+const $=id=>document.getElementById(id);
 
-document.getElementById("save").onclick = () => {
-  if (!idea.value.trim()) {
-    document.getElementById("message").textContent = "पहले Video Idea लिखें।";
-    return;
+$("duration").addEventListener("change",()=>{
+  $("customBox").style.display=
+    $("duration").value==="custom"?"block":"none";
+});
+
+function getDuration(){
+  if($("duration").value==="custom"){
+    const n=Number($("customDuration").value);
+    if(!Number.isInteger(n)||n<1||n>120)
+      throw new Error("1 से 120 मिनट के बीच समय डालें।");
+    return n;
   }
-  const items = JSON.parse(localStorage.getItem("mittiraazProjects") || "[]");
-  items.push({
-    idea: idea.value,
-    channel: channel.value,
-    language: language.value,
-    createdAt: new Date().toISOString()
-  });
-  localStorage.setItem("mittiraazProjects", JSON.stringify(items));
-  document.getElementById("message").textContent = "Project सेव हो गया!";
-};
-
-async function askAI(prompt) {
-  if (!idea.value.trim()) {
-    status.textContent = "पहले Video Idea लिखें।";
-    return;
-  }
-
-  status.textContent = "AI काम कर रहा है... कृपया इंतजार करें।";
-  result.textContent = "";
-
-  try {
-    const response = await fetch(WORKER_URL, {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({prompt})
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "AI से जवाब नहीं मिला।");
-    }
-
-    if (!data.text) {
-      throw new Error("AI ने खाली जवाब दिया।");
-    }
-
-    result.textContent = data.text;
-    status.textContent = "AI का जवाब तैयार है!";
-
-  } catch (error) {
-    status.textContent = "कनेक्शन में समस्या हुई।";
-    result.textContent = error.message;
-  }
+  return Number($("duration").value);
 }
 
-document.getElementById("script").onclick = () => {
-  const prompt = `
-आप MittiRaaz AI Studio के Video Script Expert हैं।
-Channel: ${channel.value || "MittiRaaz Story"}
-Video Idea: ${idea.value}
-Language: ${language.value}
+async function askAI(prompt){
+  const response=await fetch(WORKER_URL,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({prompt})
+  });
+  const data=await response.json();
+  if(!response.ok) throw new Error(data.error||"AI से जवाब नहीं मिला।");
+  if(!data.text) throw new Error("AI ने खाली जवाब दिया।");
+  return data.text;
+}
 
-इस आइडिया पर एक आकर्षक YouTube Short बनाइए।
-डिफॉल्ट वीडियो 10 सेकंड का रखें।
-शुरुआत में दमदार Hook, बीच में रोचक कहानी और अंत में स्पष्ट Ending रखें।
-Image Prompt और Video Prompt दें।
-Video Prompt के अंदर सभी Dialogue, Voice-over, Music, Sound Effects और Screen Text लिखें।
-आखिरी 2 सेकंड में Channel Subscribe CTA रखें।
-किरदारों का चेहरा, कपड़े और रूप हर दृश्य में एक जैसा रखें।
-जवाब व्यवस्थित और इस्तेमाल करने योग्य दें।
+$("generate").addEventListener("click",async()=>{
+  const idea=$("idea").value.trim();
+  if(!idea){$("status").textContent="पहले कहानी का विषय लिखें।";return;}
+  let minutes;
+  try{minutes=getDuration();}catch(e){$("status").textContent=e.message;return;}
+
+  $("generate").disabled=true;
+  $("status").textContent="AI आपकी पूरी वीडियो स्क्रिप्ट तैयार कर रहा है...";
+  $("result").textContent="कृपया प्रतीक्षा करें...";
+
+  const prompt=`
+आप एक अनुभवी YouTube Long Video Script Writer और Director हैं।
+
+चैनल: ${$("channel").value}
+विषय: ${idea}
+भाषा: ${$("language").value}
+वीडियो की अवधि: ${minutes} मिनट।
+
+बहुत जरूरी निर्देश:
+यह केवल LONG VIDEO है। YouTube Short या 10 सेकंड की वीडियो बिल्कुल नहीं बनानी है।
+
+पूरी ${minutes} मिनट की वीडियो के लिए विस्तार से स्क्रिप्ट लिखें।
+कहानी की लंबाई और संवाद चुनी गई अवधि के अनुसार रखें।
+जल्दी कहानी समाप्त न करें और केवल सारांश न दें।
+
+आउटपुट इस क्रम में दें:
+
+1. आकर्षक वीडियो का नाम।
+2. पहले 20-30 सेकंड का दमदार Hook।
+3. पूरी कहानी की शुरुआत, बीच और अंत।
+4. कहानी को क्रमवार Scenes में बाँटें।
+5. हर Scene का अनुमानित समय लिखें।
+6. हर Scene के लिए विस्तार से Image Prompt दें।
+7. हर Scene के लिए विस्तार से Video Prompt दें।
+8. हर Scene के सभी पात्रों के संवाद और Voice-over लिखें।
+9. Background Music और Sound Effects बताएं।
+10. हर Scene में पात्रों का चेहरा, उम्र, कपड़े, रंग और रूप एक जैसा रखें।
+11. कहानी में भावनाएं, सस्पेंस और दर्शकों की रुचि बनाए रखें।
+12. अंत में स्वाभाविक Like, Comment और Subscribe CTA दें।
+
+हर Scene में Image Prompt और Video Prompt अलग-अलग स्पष्ट लिखें।
+वीडियो की कुल अवधि लगभग ${minutes} मिनट होनी चाहिए।
+भाषा सरल, रोचक और दर्शकों के लिए आकर्षक रखें।
 `;
-  askAI(prompt);
-};
 
-document.getElementById("seo").onclick = () => {
-  const prompt = `
-आप YouTube SEO Expert हैं।
-Channel: ${channel.value || "MittiRaaz Story"}
-Video Idea: ${idea.value}
-Language: ${language.value}
+  try{
+    const answer=await askAI(prompt);
+    $("result").textContent=answer;
+    $("status").textContent="स्क्रिप्ट तैयार हो गई।";
+  }catch(e){
+    $("status").textContent="Error: "+e.message;
+  }finally{
+    $("generate").disabled=false;
+  }
+});
 
-इस वीडियो के लिए SEO तैयार करें:
-1. आकर्षक YouTube Title
-2. SEO Description
-3. Relevant Keywords
+$("seo").addEventListener("click",async()=>{
+  const idea=$("idea").value.trim();
+  if(!idea){$("status").textContent="पहले वीडियो का विषय लिखें।";return;}
+  $("seo").disabled=true;
+  $("status").textContent="SEO तैयार हो रहा है...";
+  try{
+    const prompt=`
+YouTube Long Video SEO Expert बनें।
+चैनल: ${$("channel").value}
+वीडियो का विषय: ${idea}
+भाषा: ${$("language").value}
+यह Long Video है, Short नहीं।
+
+तैयार करें:
+1. SEO Title
+2. आकर्षक Description
+3. Keywords
 4. YouTube Tags (comma separated)
 5. Hashtags
-6. Thumbnail पर लिखने के लिए छोटे शब्द
-
-Audience के हिसाब से SEO बनाएं। बेकार या गलत Tags न दें।
+6. Thumbnail पर छोटा और आकर्षक Text
+सब कुछ चुनी हुई भाषा में दें।
 `;
-  askAI(prompt);
-};
-
-document.getElementById("copy").onclick = async () => {
-  if (!result.textContent.trim()) return;
-  try {
-    await navigator.clipboard.writeText(result.textContent);
-    status.textContent = "Result Copy हो गया!";
-  } catch {
-    status.textContent = "Result को दबाकर Copy करें।";
+    $("result").textContent=await askAI(prompt);
+    $("status").textContent="SEO तैयार हो गया।";
+  }catch(e){
+    $("status").textContent="Error: "+e.message;
+  }finally{
+    $("seo").disabled=false;
   }
-};
+});
 
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(() => {});
-  });
+$("save").addEventListener("click",()=>{
+  const project={
+    channel:$("channel").value,
+    idea:$("idea").value,
+    language:$("language").value,
+    duration:$("duration").value,
+    customDuration:$("customDuration").value,
+    result:$("result").textContent
+  };
+  localStorage.setItem("mittiraazProject",JSON.stringify(project));
+  $("status").textContent="प्रोजेक्ट इस ब्राउज़र में सेव हो गया।";
+});
+
+$("copy").addEventListener("click",async()=>{
+  try{
+    await navigator.clipboard.writeText($("result").textContent);
+    $("status").textContent="Result Copy हो गया।";
+  }catch(e){
+    $("status").textContent="Copy नहीं हुआ। Result को दबाकर Copy करें।";
+  }
+});
+
+const saved=localStorage.getItem("mittiraazProject");
+if(saved){
+  try{
+    const p=JSON.parse(saved);
+    $("channel").value=p.channel||"MittiRaaz Story";
+    $("idea").value=p.idea||"";
+    $("language").value=p.language||"Hindi";
+    $("duration").value=p.duration||"15";
+    $("customDuration").value=p.customDuration||"";
+    $("customBox").style.display=p.duration==="custom"?"block":"none";
+    $("result").textContent=p.result||"आपका AI Result यहाँ दिखाई देगा।";
+  }catch(e){}
 }
 </script>
 </body>
