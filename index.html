@@ -7,287 +7,264 @@
 <meta name="theme-color" content="#111827">
 <title>MittiRaaz AI Studio</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;padding:14px;background:#101827;color:#fff;font-family:Arial,sans-serif}
-main{max-width:800px;margin:auto}
-h1{color:#fbbf24;text-align:center}
-.card{background:#1f2937;padding:15px;border-radius:13px;margin:14px 0}
-h2{color:#fbbf24;font-size:19px}
-label{display:block;margin:12px 0 6px}
-input,select,textarea{width:100%;padding:12px;border-radius:8px;border:1px solid #526071;background:#111827;color:white;font-size:16px}
-textarea{min-height:90px}
-button{padding:12px;border:0;border-radius:8px;background:#f59e0b;color:#111827;font-weight:bold;font-size:15px;margin:5px 3px;cursor:pointer}
+*{box-sizing:border-box}body{margin:0;background:#0b1020;color:#f8fafc;font-family:Arial,sans-serif;padding:16px}
+header{text-align:center;padding:18px 5px}h1{color:#fbbf24;margin:5px}header p{color:#cbd5e1}
+.panel{background:#172033;border:1px solid #334155;border-radius:14px;padding:15px;margin:12px 0}
+label{display:block;margin:12px 0 6px;color:#fbbf24;font-weight:bold}
+input,textarea,select{width:100%;padding:12px;border-radius:9px;border:1px solid #475569;background:#0b1020;color:white;font-size:15px}
+textarea{min-height:95px;resize:vertical}
+button{border:0;border-radius:9px;padding:12px 14px;margin:5px 3px;background:#f59e0b;color:#111827;font-weight:bold;font-size:14px}
+button.secondary{background:#334155;color:white}
 button:disabled{opacity:.5}
-#result{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6}
-.small{color:#aab7c8;font-size:13px}
-.status{color:#86efac;white-space:pre-wrap}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.grid button{margin:0;min-height:52px}
+#result{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;min-height:140px}
+.small{color:#94a3b8;font-size:12px}
+.status{color:#86efac;min-height:22px}
 </style>
 </head>
 <body>
-<main>
-<h1>🎬 MittiRaaz AI Studio</h1>
-<p style="text-align:center">Your All-in-One YouTube Creator AI</p>
+<header>
+<h1>🌾 MittiRaaz AI Studio</h1>
+<p>All-in-One YouTube Creator Assistant</p>
+<div class="small">Free-tier connection • No automatic billing</div>
+</header>
 
-<div class="card">
-<h2>⚙️ वीडियो की जानकारी</h2>
-<label>चैनल का नाम</label>
+<div class="panel">
+<h3>🎬 Channel & Video Details</h3>
+<label>Channel Name</label>
 <input id="channel" value="MittiRaaz Story">
-<label>कहानी / वीडियो का विषय</label>
-<textarea id="idea" placeholder="जैसे: गरीब किसान और जादुई कुआँ"></textarea>
-<label>वीडियो की भाषा</label>
-<select id="language">
-<option>Hindi</option><option>English</option><option>Hinglish</option>
+<label>Video Topic / Idea</label>
+<textarea id="topic" placeholder="जैसे: गरीब किसान और जादुई कुआँ"></textarea>
+<label>Audience</label>
+<select id="audience">
+<option>India - Hindi Audience</option>
+<option>USA - English Audience</option>
+<option>Worldwide - English Audience</option>
 </select>
-<label>वीडियो की अवधि</label>
+<label>Video Type</label>
+<select id="type">
+<option>2D Cartoon Moral Story</option>
+<option>Suspense Story</option>
+<option>Comedy Video</option>
+<option>Devotional Video</option>
+<option>Educational Video</option>
+<option>Machine / Car / Technology</option>
+<option>Custom</option>
+</select>
+<label>Video Duration (Minutes)</label>
 <select id="duration">
-<option value="5">5 मिनट</option>
-<option value="10">10 मिनट</option>
-<option value="15">15 मिनट</option>
-<option value="20">20 मिनट</option>
-<option value="30">30 मिनट</option>
-<option value="custom">अपनी अवधि</option>
+<option>1</option><option>2</option><option>5</option>
+<option>10</option><option>15</option><option>20</option>
+<option>30</option><option>60</option><option>Custom</option>
 </select>
-<div id="customBox" hidden>
-<label>कितने मिनट? (1–120)</label>
-<input id="customDuration" type="number" min="1" max="120" value="5">
-</div>
-<p class="small">हर Scene 10 सेकंड का होगा। हर Scene के लिए अलग Image Prompt और Video Prompt।</p>
+<input id="customDuration" type="number" min="1" max="120" placeholder="Custom minutes (1–120)" style="display:none">
+<label>Extra Instructions</label>
+<textarea id="extra" placeholder="अपनी खास जरूरत लिखें..."></textarea>
 </div>
 
-<div class="card">
-<h2>📖 Story & Script Studio</h2>
-<button onclick="make('story')">कहानी लिखें</button>
-<button onclick="make('hook')">Viral Hook बनाएं</button>
-<button onclick="startScript()">पूरी वीडियो स्क्रिप्ट बनाएं</button>
-<button id="continue" onclick="continueScript()" hidden>बाकी Scenes जारी रखें</button>
-<button onclick="make('characters')">Character Design / Bible</button>
+<div class="panel">
+<h3>✍️ Story & Script Studio</h3>
+<div class="grid">
+<button onclick="run('story')">📖 Story Writing</button>
+<button onclick="run('script')">🎬 Full Video Script</button>
+<button onclick="run('short')">⚡ YouTube Short Script</button>
+<button onclick="run('dialogue')">🗣️ Dialogue Writing</button>
+<button onclick="run('hook')">🎯 Powerful Hook</button>
+<button onclick="run('ending')">🏁 Story Ending</button>
+<button onclick="run('characters')">👥 Character Details</button>
+<button onclick="run('scene')">🎞️ Scene Breakdown</button>
+</div>
 </div>
 
-<div class="card">
-<h2>🚀 YouTube SEO Studio</h2>
-<button onclick="make('title')">Viral Title बनाएं</button>
-<button onclick="make('description')">Description बनाएं</button>
-<button onclick="make('keywords')">Keywords बनाएं</button>
-<button onclick="make('tags')">YouTube Tags बनाएं</button>
-<button onclick="make('hashtags')">Hashtags बनाएं</button>
-<button onclick="make('seo')">पूरा SEO पैकेज बनाएं</button>
+<div class="panel">
+<h3>🖼️ Image & Video Prompts</h3>
+<div class="grid">
+<button onclick="run('image')">🖼️ Image Prompts</button>
+<button onclick="run('video')">🎥 Google Flow Prompts</button>
+<button onclick="run('continuity')">🔒 Character Consistency</button>
+<button onclick="run('voice')">🎙️ Voice & Sound Plan</button>
+</div>
+<p class="small">Long videos: हर सीन 10 सेकंड का रखें। हर सीन में Image Prompt और Video Prompt अलग-अलग दें।</p>
 </div>
 
-<div class="card">
-<h2>🖼️ Thumbnail Studio</h2>
-<button onclick="make('thumbnail')">Thumbnail Prompt बनाएं</button>
-<button onclick="make('thumbtext')">Thumbnail Text बनाएं</button>
-<button onclick="make('thumbnailidea')">Thumbnail Design Idea</button>
+<div class="panel">
+<h3>🚀 YouTube SEO Studio</h3>
+<div class="grid">
+<button onclick="run('title')">📝 Viral Title</button>
+<button onclick="run('description')">📄 Description</button>
+<button onclick="run('keywords')">🔎 Keywords</button>
+<button onclick="run('tags')">🏷️ Tags</button>
+<button onclick="run('hashtags')">#️⃣ Hashtags</button>
+<button onclick="run('seo')">🚀 Complete SEO</button>
+</div>
 </div>
 
-<div class="card">
-<h2>🎥 Video Analysis Studio</h2>
-<button onclick="make('analysis')">Video Idea Analysis</button>
-<button onclick="make('improve')">Viral बनाने के सुझाव</button>
-<button onclick="make('retention')">Audience Retention Plan</button>
+<div class="panel">
+<h3>🎨 Thumbnail Studio</h3>
+<div class="grid">
+<button onclick="run('thumbnail')">🖼️ Thumbnail Prompt</button>
+<button onclick="run('thumbtext')">💥 Thumbnail Text</button>
+<button onclick="run('thumbidea')">💡 Thumbnail Design Idea</button>
+</div>
+<p class="small">यह Thumbnail के लिए टेक्स्ट और AI image prompt बनाएगा; खुद image generate नहीं करेगा।</p>
 </div>
 
-<div class="card">
-<h2>📦 Complete Creator Package</h2>
-<p class="small">एक साथ कहानी का आइडिया, Hook, Title, Description, Keywords, Tags, Hashtags और Thumbnail तैयार करें।</p>
-<button onclick="make('complete')">पूरा YouTube पैकेज बनाएं</button>
+<div class="panel">
+<h3>📈 Growth & Analysis Studio</h3>
+<div class="grid">
+<button onclick="run('ideas')">💡 Viral Video Ideas</button>
+<button onclick="run('analysis')">📊 Video Idea Analysis</button>
+<button onclick="run('retention')">⏱️ Audience Retention Plan</button>
+<button onclick="run('improve')">⭐ Improve My Video</button>
+<button onclick="run('competitor')">🔍 Competitor Strategy</button>
+<button onclick="run('upload')">📅 Upload Strategy</button>
+</div>
 </div>
 
-<div class="card">
-<h2>📄 AI Result</h2>
-<p id="status" class="status">अपना विषय लिखकर कोई विकल्प चुनें।</p>
-<div id="result">आपका AI Result यहाँ दिखाई देगा।</div>
+<div class="panel">
+<h3>🌟 Complete Creator Package</h3>
+<button style="width:100%" onclick="run('complete')">🚀 Generate Complete Package</button>
+<p class="small">Story, script, prompts, SEO और thumbnail plan एक साथ।</p>
+</div>
+
+<div class="panel">
+<h3>📋 Your AI Result</h3>
+<div class="status" id="status"></div>
+<div id="result">आपका AI result यहाँ दिखाई देगा।</div>
 <button onclick="copyResult()">📋 Copy Result</button>
-<button onclick="downloadResult()">⬇️ Download TXT</button>
-<button onclick="clearResult()">🗑️ नया Result</button>
+<button class="secondary" onclick="downloadResult()">⬇️ Download TXT</button>
+<button class="secondary" onclick="clearResult()">🗑️ Clear</button>
 </div>
-
-<div class="card">
-<h2>💾 Project Save</h2>
-<button onclick="saveProject()">प्रोजेक्ट सेव करें</button>
-<button onclick="loadProject()">सेव प्रोजेक्ट खोलें</button>
-</div>
-
-<p class="small">AI generation free-tier availability और usage limits पर निर्भर है। यह ऐप स्क्रिप्ट और prompts बनाता है। वीडियो बनाना, YouTube पर upload करना और वास्तविक analytics अलग सेवाओं/अनुमतियों से जुड़े हैं।</p>
-</main>
 
 <script>
-const WORKER_URL="https://shiny-silence-623a.bikashbhandarimittiraazstory.workers.dev";
+const WORKER="https://shiny-silence-623a.bikashbhandarimittiraazstory.workers.dev";
 const $=id=>document.getElementById(id);
-let busy=false, project=null;
+let busy=false;
 
-$("duration").onchange=()=>{
- $("customBox").hidden=$("duration").value!=="custom";
-};
+$("duration").addEventListener("change",()=>{
+ $("customDuration").style.display=$("duration").value==="Custom"?"block":"none";
+});
 
-function info(){
- const idea=$("idea").value.trim();
- if(!idea)throw Error("पहले कहानी या वीडियो का विषय लिखें।");
+function details(){
+ const audience=$("audience").value;
+ const lang=audience.includes("USA")||audience.includes("Worldwide")?"American English":"Hindi";
+ const duration=$("duration").value==="Custom"?$("customDuration").value:$("duration").value;
  return {
- channel:$("channel").value.trim()||"MittiRaaz Story",
- idea,language:$("language").value
+ channel:$("channel").value.trim(),
+ topic:$("topic").value.trim(),
+ audience,lang,duration,
+ type:$("type").value,
+ extra:$("extra").value.trim()
  };
 }
 
-function duration(){
- let n=$("duration").value==="custom"?Number($("customDuration").value):Number($("duration").value);
- if(!Number.isInteger(n)||n<1||n>120)throw Error("अवधि 1 से 120 मिनट के बीच रखें।");
- return n;
-}
-
-async function askAI(prompt){
- const r=await fetch(WORKER_URL,{
- method:"POST",
- headers:{"Content-Type":"application/json"},
- body:JSON.stringify({prompt})
- });
- let d={};
- try{d=await r.json()}catch(e){}
- if(!r.ok)throw Error(d.error||"AI से जवाब नहीं मिला।");
- if(!d.text)throw Error("AI ने खाली जवाब दिया।");
- return d.text;
-}
-
 const tasks={
- story:`पूरी आकर्षक, भावनात्मक और suspense वाली हिंदी कहानी लिखें। शुरुआत, संघर्ष, ट्विस्ट, क्लाइमैक्स, अच्छा अंत और नैतिक शिक्षा रखें।`,
- hook:`पहले 30 सेकंड के लिए जबरदस्त curiosity hook, suspense और narration लिखें जिससे दर्शक आगे देखना चाहें।`,
- characters:`कहानी के सभी पात्रों की Character Bible बनाएं। उम्र, चेहरा, शरीर, कपड़े, रंग, आवाज, बोलने का अंदाज और हर दृश्य में continuity के नियम तय करें।`,
- title:`10 आकर्षक, curiosity पैदा करने वाले YouTube titles दें। मुख्य keyword स्वाभाविक रूप से रखें। झूठे या भ्रामक दावे न करें।`,
- description:`एक SEO-friendly YouTube description लिखें। शुरुआत में मुख्य keyword, कहानी का सार, दर्शकों से सवाल और channel CTA रखें।`,
- keywords:`इस वीडियो के लिए relevant YouTube search keywords दें। Hindi और English दोनों में उपयोगी keywords शामिल करें।`,
- tags:`YouTube के लिए relevant comma-separated tags दें। अनावश्यक और असंबंधित tags न दें।`,
- hashtags:`वीडियो के लिए relevant hashtags दें। लोकप्रिय और विषय से जुड़े hashtags ही चुनें।`,
- seo:`पूरा YouTube SEO पैकेज बनाएं: 10 Titles, SEO Description, Primary Keyword, Secondary Keywords, Search Keywords, comma-separated Tags, Hashtags, Pinned Comment और CTA।`,
- thumbnail:`YouTube thumbnail के लिए detailed English AI image prompt दें। 16:9, cinematic composition, expressive faces, high contrast, clear focal subject, dramatic lighting, readable space. कहानी से मेल खाए।`,
- thumbtext:`Thumbnail पर लिखने के लिए 10 छोटे, दमदार, curiosity वाले Hindi text options दें। हर विकल्प 2 से 5 शब्द का हो।`,
- thumbnailidea:`3 अलग thumbnail concepts बताएं: characters की position, facial expression, background, lighting, colors और text placement सहित।`,
- analysis:`वीडियो आइडिया का विश्लेषण करें: target audience, originality, emotional appeal, strengths, weaknesses, competition और improvement।`,
- improve:`इस वीडियो को अधिक engaging बनाने के practical सुझाव दें। बेहतर opening, suspense, twists, pacing और ending बताएं।`,
- retention:`पूरे वीडियो का audience retention plan बनाएं। हर हिस्से में curiosity, scene changes, suspense और payoff बताएं।`,
- complete:`एक पूरा YouTube Creator Package बनाएं: कहानी का सार, opening hook, 10 SEO titles, description, primary और secondary keywords, comma-separated tags, hashtags, pinned comment, CTA, thumbnail prompt और thumbnail text।`
+story:"एक आकर्षक, मौलिक, भावनात्मक और रोचक पूरी कहानी लिखो। शुरुआत में मजबूत hook, बीच में suspense और अंत में संतोषजनक सीख हो।",
+script:"पूरी वीडियो स्क्रिप्ट लिखो। हर सीन ठीक 10 सेकंड का हो। हर सीन के लिए Scene number और time, Image Prompt, Video Prompt, dialogue/voice-over, music और sound effects दो। हर सीन में सभी जरूरी बातें लिखो। किरदारों का चेहरा, उम्र, शरीर, कपड़े, रंग और आवाज पूरी कहानी में एक जैसे रहें।",
+short:"ठीक 10 सेकंड का YouTube Short बनाओ। पहले 2 सेकंड में hook, तेज और स्पष्ट कहानी, lip-sync dialogue, music, SFX और screen text Video Prompt के अंदर रखो। आखिरी 2 सेकंड में Subscribe CTA रखो।",
+dialogue:"कहानी के सभी किरदारों के स्वाभाविक, भावनात्मक और lip-sync के अनुकूल संवाद लिखो। हर किरदार की आवाज अलग और पूरी कहानी में स्थिर रहे।",
+hook:"इस विषय के लिए पहले 3 सेकंड में दर्शक रोकने वाले 10 मजबूत hooks लिखो।",
+ending:"इस कहानी के लिए 5 यादगार, भावनात्मक और प्रभावशाली endings लिखो।",
+characters:"कहानी के हर किरदार की पूरी Character Bible बनाओ: चेहरा, उम्र, लंबाई, शरीर, बाल, कपड़े, जूते, रंग, आवाज और स्वभाव। हर सीन में यही डिजाइन लॉक रहे।",
+scene:"पूरी कहानी को क्रमवार 10-10 सेकंड के दृश्यों में बाँटो। कोई जरूरी घटना या ending न छोड़ो।",
+image:"हर सीन के लिए अलग detailed Image Prompt लिखो। सभी किरदारों का रूप एक जैसा रखो। सही location, lighting, camera angle और 9:16 या 16:9 framing बताओ।",
+video:"Google Flow के लिए हर सीन का अलग ठीक 10 सेकंड का Video Prompt लिखो। Motion, camera, lip sync, dialogue, voice-over, music, SFX और on-screen text उसी Video Prompt में शामिल करो।",
+continuity:"पूरे वीडियो के लिए Character Consistency Lock बनाओ। हर सीन में वही चेहरे, शरीर, कपड़े, रंग, props और आवाज रहें। कोई duplicate character या अचानक बदलाव न हो।",
+voice:"हर किरदार के लिए voice profile, narration style, background music और scene-wise sound effects लिखो। आवाज सभी दृश्यों में समान रहे।",
+title:"YouTube के लिए 10 आकर्षक, searchable और curiosity पैदा करने वाले titles लिखो। बेवजह झूठे viral दावे मत करो।",
+description:"मुख्य keywords के साथ natural SEO-friendly YouTube description लिखो। शुरुआती दो वाक्यों में विषय स्पष्ट हो। जरूरी CTA और relevant hashtags शामिल करो।",
+keywords:"इस वीडियो के लिए Hindi और English में relevant YouTube search keywords लिखो।",
+tags:"YouTube Studio के लिए relevant comma-separated tags दो।",
+hashtags:"इस वीडियो के लिए relevant और सीमित hashtags लिखो।",
+seo:"एक पूरा YouTube SEO package बनाओ: 10 titles, description, primary keywords, secondary keywords, comma-separated tags और hashtags।",
+thumbnail:"YouTube thumbnail बनाने के लिए detailed AI image prompt लिखो। Strong emotion, clear subject, dramatic lighting और readable composition हो। Shorts के लिए 9:16 और long video के लिए 16:9 बताओ।",
+thumbtext:"Thumbnail पर लिखने के लिए 10 छोटे, bold, curiosity पैदा करने वाले text options दो।",
+thumbidea:"3 अलग thumbnail concepts बताओ: subject placement, facial expression, background, colors और short text।",
+ideas:"इस चैनल और audience के लिए 20 original video ideas दो। हर idea में छोटा hook और संभावित audience interest बताओ।",
+analysis:"इस वीडियो आइडिया का विश्लेषण करो: hook, audience, originality, retention risk, emotional appeal और सुधार के सुझाव।",
+retention:"पूरे वीडियो के लिए audience retention plan बनाओ। हर हिस्से में suspense, visual change, curiosity और payoff रखो।",
+improve:"इस वीडियो आइडिया या script को बेहतर बनाने के लिए कमजोर हिस्से, सुधार और revised version बताओ।",
+competitor:"इस niche में सफल creators से सीखने योग्य सामान्य content strategy बताओ। बिना वास्तविक data के किसी competitor के आंकड़े मत गढ़ो।",
+upload:"इस audience के लिए upload schedule, content consistency और performance tracking की practical strategy बताओ।",
+complete:"एक complete creator package बनाओ: story, hook, character bible, पूरी script, हर 10 सेकंड के सीन के Image Prompt और Video Prompt, dialogues, music, SFX, title, description, keywords, comma-separated tags, hashtags और thumbnail prompt। कोई section मत छोड़ो।"
 };
 
-async function make(type){
+async function run(task){
  if(busy)return;
- try{
- const x=info();
- const task=tasks[type];
- if(!task)throw Error("यह विकल्प उपलब्ध नहीं है।");
+ const d=details();
+ if(!d.topic){alert("पहले Video Topic / Idea लिखिए।");return;}
+ if(task==="script"||task==="complete"){
+  if(!d.duration||Number(d.duration)<1||Number(d.duration)>120){
+   alert("कृपया 1 से 120 मिनट की अवधि चुनें।");return;
+  }
+ }
+ const prompt=`You are MittiRaaz AI Studio, an expert YouTube creator assistant.
+Channel: ${d.channel}
+Topic: ${d.topic}
+Audience: ${d.audience}
+Output language: ${d.lang}
+Video type: ${d.type}
+Duration: ${d.duration} minutes
+Extra instructions: ${d.extra||"None"}
+
+IMPORTANT:
+- Follow the selected task exactly.
+- For long videos, every scene must be exactly 10 seconds. Total scenes = duration in minutes × 6.
+- Keep character appearance, clothes, props and voices consistent.
+- For every scene provide separate Image Prompt and Video Prompt when prompts are requested.
+- Put dialogue, voice-over, music, SFX and screen text inside the Video Prompt too.
+- Do not skip the ending.
+- Make useful, original, audience-friendly content. Never promise guaranteed virality.
+- If the requested output is too long, clearly state which scenes/sections remain instead of pretending it is complete.
+
+TASK: ${tasks[task]}`;
+
  busy=true;
- setButtons(true);
- $("status").textContent="AI काम कर रहा है: "+type+"...";
- const prompt=`आप अनुभवी YouTube strategist, Hindi storyteller और SEO expert हैं।
-Channel: ${x.channel}
-Topic: ${x.idea}
-Language: ${x.language}
-Task: ${task}
-सामग्री original, useful, engaging और audience-friendly हो। Viral होने की गारंटी न दें। Output साफ headings में दें।`;
- const answer=await askAI(prompt);
- $("result").textContent=answer;
- $("status").textContent="✅ काम पूरा हुआ: "+type;
- }catch(e){$("status").textContent="समस्या: "+e.message}
- finally{busy=false;setButtons(false)}
-}
-
-function setButtons(disabled){
- document.querySelectorAll("button").forEach(b=>b.disabled=disabled);
-}
-
-function saveProject(){
- const data={channel:$("channel").value,idea:$("idea").value,language:$("language").value,duration:$("duration").value,customDuration:$("customDuration").value,result:$("result").textContent};
- localStorage.setItem("mittiraazStudioProject",JSON.stringify(data));
- $("status").textContent="✅ प्रोजेक्ट सेव हो गया।";
-}
-function loadProject(){
- try{
- const p=JSON.parse(localStorage.getItem("mittiraazStudioProject")||"null");
- if(!p)throw Error("कोई सेव प्रोजेक्ट नहीं मिला।");
- $("channel").value=p.channel||"MittiRaaz Story";
- $("idea").value=p.idea||"";
- $("language").value=p.language||"Hindi";
- $("duration").value=p.duration||"5";
- $("customDuration").value=p.customDuration||"";
- $("customBox").hidden=p.duration!=="custom";
- $("result").textContent=p.result||"";
- $("status").textContent="सेव प्रोजेक्ट खुल गया।";
- }catch(e){$("status").textContent=e.message}
-}
-function clearResult(){
+ $("status").textContent="⏳ AI काम कर रहा है... कृपया प्रतीक्षा करें।";
  $("result").textContent="";
- $("status").textContent="नया Result तैयार है।";
-}
-async function copyResult(){
+ document.querySelectorAll("button").forEach(b=>b.disabled=true);
  try{
- await navigator.clipboard.writeText($("result").textContent);
- $("status").textContent="कॉपी हो गया।";
- }catch(e){$("status").textContent="Result को दबाकर Copy करें।"}
+  const response=await fetch(WORKER,{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({prompt})
+  });
+  const data=await response.json();
+  if(!response.ok)throw new Error(data.error||data.message||"API request failed: "+response.status);
+  const answer=data.text||data.output||data.result;
+  if(!answer)throw new Error("AI से खाली जवाब मिला।");
+  $("result").textContent=answer;
+  $("status").textContent="✅ Result तैयार है।";
+ }catch(e){
+  $("status").textContent="❌ Error";
+  $("result").textContent="समस्या: "+e.message+"\n\nकृपया यह error text मुझे भेजें। अपनी API key कभी साझा न करें।";
+ }finally{
+  busy=false;
+  document.querySelectorAll("button").forEach(b=>b.disabled=false);
+ }
+}
+
+function copyResult(){
+ const text=$("result").textContent;
+ if(!text.trim())return;
+ if(navigator.clipboard&&navigator.clipboard.writeText){
+  navigator.clipboard.writeText(text).then(()=>$("status").textContent="✅ Copy हो गया।").catch(()=>fallbackCopy(text));
+ }else fallbackCopy(text);
+}
+function fallbackCopy(text){
+ const t=document.createElement("textarea");t.value=text;document.body.appendChild(t);t.select();
+ try{document.execCommand("copy");$("status").textContent="✅ Copy हो गया।"}catch(e){$("status").textContent="Copy नहीं हुआ।"}
+ t.remove();
 }
 function downloadResult(){
- const blob=new Blob([$("result").textContent],{type:"text/plain;charset=utf-8"});
+ const text=$("result").textContent;
+ if(!text.trim())return;
  const a=document.createElement("a");
- a.href=URL.createObjectURL(blob);
- a.download="MittiRaaz-AI-Result.txt";
- a.click();
- URL.revokeObjectURL(a.href);
+ const url=URL.createObjectURL(new Blob([text],{type:"text/plain;charset=utf-8"}));
+ a.href=url;a.download="MittiRaaz-AI-Result.txt";a.click();URL.revokeObjectURL(url);
 }
-
-async function startScript(){
- try{
- const x=info(),minutes=duration();
- project={...x,minutes,total:minutes*6,next:1,output:"",bible:""};
- localStorage.setItem("mittiraazScriptProgress",JSON.stringify(project));
- await continueScript();
- }catch(e){$("status").textContent=e.message}
-}
-
-async function continueScript(){
- if(busy||!project)return;
- busy=true;setButtons(true);
- try{
- if(!project.bible){
- $("status").textContent="Character Bible और पूरी कहानी का प्लान बन रहा है...";
- project.bible=await askAI(`आप अनुभवी फिल्म लेखक हैं। Channel ${project.channel}. Topic ${project.idea}. Language ${project.language}. पूरी कहानी का beginning, conflict, twists, climax और ending तय करें। सभी पात्रों की उम्र, चेहरा, शरीर, कपड़े, रंग, आवाज और स्थायी रूप की Character Bible दें।`);
- }
- const start=project.next;
- const end=Math.min(start+2,project.total);
- $("status").textContent=`Scene ${start} से ${end} तैयार हो रहे हैं। कुल ${project.total} Scenes हैं।`;
- const prompt=`आप Google Flow के लिए professional film script writer हैं।
-कहानी: ${project.idea}
-भाषा: ${project.language}
-कुल अवधि: ${project.minutes} मिनट।
-कुल Scenes: ${project.total}.
-हर Scene बिल्कुल 10 सेकंड का होगा।
-Character Bible और कहानी का प्लान:
-${project.bible}
-केवल Scene ${start} से ${end} तक लिखें।
-हर Scene में अलग IMAGE PROMPT (English), VIDEO PROMPT (English, exactly 10 seconds, 16:9, camera/action/movement), DIALOGUE/VOICE OVER (Hindi), BGM और SFX दें।
-पात्रों का चेहरा, कपड़े, उम्र, आवाज हर Scene में एक जैसी रखें।
-हर Scene में कहानी आगे बढ़े। समय क्रम और numbering सही रखें। कोई scene skip न करें।
-हर संवाद 10 सेकंड में बोला जा सकने जितना हो।
-केवल मांगे गए Scenes दें।`;
- const answer=await askAI(prompt);
- project.output+="\n\n"+answer;
- project.next=end+1;
- localStorage.setItem("mittiraazScriptProgress",JSON.stringify(project));
- $("result").textContent=project.output;
- $("continue").hidden=project.next>project.total;
- $("status").textContent=project.next>project.total?
- "🎉 पूरी स्क्रिप्ट तैयार! "+project.total+" Scenes.":
- `Scene ${end}/${project.total} तैयार। आगे के लिए बाकी Scenes जारी रखें दबाएं।`;
- }catch(e){
- $("status").textContent="रुक गया: "+e.message+" पहले से बने Scenes सेव हैं।";
- $("continue").hidden=false;
- }finally{busy=false;setButtons(false)}
-}
-
-try{
- const p=JSON.parse(localStorage.getItem("mittiraazScriptProgress")||"null");
- if(p&&p.next<=p.total){
- project=p;
- $("continue").hidden=false;
- $("result").textContent=p.output||"";
- }
-}catch(e){}
+function clearResult(){$("result").textContent="";$("status").textContent="";}
 </script>
 </body>
 </html>
